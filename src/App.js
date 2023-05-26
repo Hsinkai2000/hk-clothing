@@ -2,7 +2,7 @@ import { Route, Routes } from "react-router-dom";
 import { Fragment } from "react";
 import Navigation from "./routes/navigation/navigation.component";
 import Home from "./routes/home/home.component";
-import SignIn from "./routes/signin/sign-in.component";
+import SignIn from "./routes/Authentication/authentication.component";
 
 const Shop = () => {
     return (
