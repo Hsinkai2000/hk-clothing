@@ -3,14 +3,7 @@ import { Fragment } from "react";
 import Navigation from "./routes/navigation/navigation.component";
 import Home from "./routes/home/home.component";
 import SignIn from "./routes/Authentication/authentication.component";
-
-const Shop = () => {
-    return (
-        <Fragment>
-            <h1>Shop fragment</h1>
-        </Fragment>
-    );
-};
+import Shop from "./routes/shop/shop.component";
 
 const App = () => {
     return (
