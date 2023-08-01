@@ -2,7 +2,7 @@
 // import { getRedirectResult } from "firebase/auth";
 import SignUpForm from "../../components/signup/signup-form.component";
 import SignInForm from "../../components/signin/signin-form.component";
-import "./authentication.styles.scss";
+import { AuthenticationContainer } from "./authentication.styles";
 
 const SignIn = () => {
     // useEffect(() => {
@@ -18,10 +18,10 @@ const SignIn = () => {
     // }, []);
 
     return (
-        <div className="authentication-container">
+        <AuthenticationContainer>
             <SignInForm />
             <SignUpForm />
-        </div>
+        </AuthenticationContainer>
     );
 };
 
