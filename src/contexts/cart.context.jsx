@@ -1,4 +1,5 @@
-import { useState, createContext, useEffect } from "react";
+import { useState, createContext, useEffect, useReducer } from "react";
+import { createAction } from "../utils/reducer/reducer.utils";
 
 export const CartContext = createContext({
     isCartOpen: false,
@@ -11,6 +12,31 @@ export const CartContext = createContext({
     totalPrice: 0,
     setTotalPrice: () => {},
 });
+
+const INITIAL_STATE = {
+    isCartOpen: false,
+    cartItems: [],
+    cartCount: 0,
+    totalPrice: 0,
+};
+
+const CART_ACTION_TYPES = {
+    SET_CART_ITEMS: "SET_CART_ITEMS",
+    SET_CART_OPEN: "SET_CART_OPEN",
+};
+
+const cartReducer = (state, action) => {
+    const { type, payload } = action;
+
+    switch (type) {
+        case CART_ACTION_TYPES.SET_CART_ITEMS:
+            return { ...state, ...payload };
+        case CART_ACTION_TYPES.SET_CART_OPEN:
+            return { ...state, isCartOpen: payload };
+        default:
+            throw new Error(`unhandled type of ${type} in cartReducer`);
+    }
+};
 
 const addCartItem = (cartItems, productToAdd) => {
     const existingItem = cartItems.find((item) => item.id === productToAdd.id);
@@ -49,41 +75,51 @@ const deleteCartItem = (cartItems, productToDelete) => {
 };
 
 export const CartProvider = ({ children }) => {
-    const [isCartOpen, setIsCartOpen] = useState(false);
-    const [cartItems, setCartItems] = useState([]);
-    const [cartCount, setCartCount] = useState(0);
-    const [totalPrice, setTotalPrice] = useState(0);
-    useEffect(() => {
-        const newCartCount = cartItems.reduce(
+    const [{ cartItems, isCartOpen, cartCount, cartTotal }, dispatch] =
+        useReducer(cartReducer, INITIAL_STATE);
+
+    const updateCartItemsReducer = (newCartItems) => {
+        const newCartCount = newCartItems.reduce(
             (acc, item) => acc + item.quantity,
             0
         );
-        setCartCount(newCartCount);
-    }, [cartItems]);
 
-    useEffect(() => {
-        if (cartItems) {
-            const newPrice = cartItems.reduce(
-                (acc, item) => acc + item.quantity * item.price,
-                0
-            );
-            setTotalPrice(newPrice);
-        }
-    }, [cartItems]);
+        const newCartTotal = newCartItems.reduce(
+            (total, cartItem) => total + cartItem.quantity * cartItem.price,
+            0
+        );
+
+        dispatch(
+            createAction(CART_ACTION_TYPES.SET_CART_ITEMS, {
+                cartItems: newCartItems,
+                cartTotal: newCartTotal,
+                cartCount: newCartCount,
+            })
+        );
+    };
+
+    const setIsCartOpen = (newIsCartOpen) => {
+        dispatch(createAction(CART_ACTION_TYPES.SET_CART_OPEN, newIsCartOpen));
+    };
 
     const addItemToCart = (productToAdd) => {
-        setCartItems(addCartItem(cartItems, productToAdd));
+        const newCartItems = addCartItem(cartItems, productToAdd);
+        updateCartItemsReducer(newCartItems);
     };
 
     const removeItemFromCart = (productToRemove) => {
-        setCartItems(removeCartItem(cartItems, productToRemove));
+        const newCartItems = removeCartItem(cartItems, productToRemove);
+
+        updateCartItemsReducer(newCartItems);
     };
     const deleteItemFromCart = (productToDelete) => {
-        setCartItems(deleteCartItem(cartItems, productToDelete));
+        const newCartItems = deleteCartItem(cartItems, productToDelete);
+
+        updateCartItemsReducer(newCartItems);
     };
 
     const value = {
-        totalPrice,
+        cartTotal,
         isCartOpen,
         setIsCartOpen,
         addItemToCart,
@@ -96,3 +132,20 @@ export const CartProvider = ({ children }) => {
         <CartContext.Provider value={value}>{children}</CartContext.Provider>
     );
 };
+// useEffect(() => {
+//     const newCartCount = cartItems.reduce(
+//         (acc, item) => acc + item.quantity,
+//         0
+//     );
+//     setCartCount(newCartCount);
+// }, [cartItems]);
+
+// useEffect(() => {
+//     if (cartItems) {
+//         const newPrice = cartItems.reduce(
+//             (acc, item) => acc + item.quantity * item.price,
+//             0
+//         );
+//         setTotalPrice(newPrice);
+//     }
+// }, [cartItems]);
