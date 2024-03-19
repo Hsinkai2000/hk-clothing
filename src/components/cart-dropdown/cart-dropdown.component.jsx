@@ -7,10 +7,11 @@ import Button, { BUTTON_TYPE_CLASSES } from "../button/button.component";
 import CartItem from "../cart-items/cart-items.component";
 
 import { useNavigate } from "react-router-dom";
-import { useContext } from "react";
-import { CartContext } from "../../contexts/cart.context";
+import { selectCartItems } from "../../store/cart/cart.selector";
+import { useSelector } from "react-redux";
+
 const CartDropdown = () => {
-    const { cartItems } = useContext(CartContext);
+    const cartItems = useSelector(selectCartItems);
     const navigate = useNavigate();
     const goToCheckout = () => {
         navigate("/checkout");

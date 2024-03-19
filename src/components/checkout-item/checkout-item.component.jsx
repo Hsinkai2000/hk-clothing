@@ -7,20 +7,22 @@ import {
     BaseSpan,
     RemoveButton,
 } from "./checkout-item.style";
-import { CartContext } from "../../contexts/cart.context";
-import { useContext } from "react";
+import { removeItemFromCart, addItemToCart, deleteItemFromCart } from "../../store/cart/cart.action.js";
+import { useDispatch, useSelector } from "react-redux";
+import { selectCartItems } from "../../store/cart/cart.selector.js";
+
 const CheckoutItem = ({ cartItem }) => {
+    const dispatch = useDispatch();
     const { name, quantity, imageUrl, price } = cartItem;
-    const { addItemToCart, removeItemFromCart, deleteItemFromCart } =
-        useContext(CartContext);
+    const cartItems = useSelector(selectCartItems);
     const handleIncrease = () => {
-        return addItemToCart(cartItem);
+        return dispatch(addItemToCart(cartItems,cartItem));
     };
     const handleDecrease = () => {
-        return removeItemFromCart(cartItem);
+        return dispatch(removeItemFromCart(cartItems,cartItem));
     };
     const handleRemove = () => {
-        return deleteItemFromCart(cartItem);
+        return  dispatch(deleteItemFromCart(cartItems,cartItem));
     };
 
     return (
